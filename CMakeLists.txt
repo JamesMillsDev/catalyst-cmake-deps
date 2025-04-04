@@ -52,4 +52,4 @@ endforeach()
 add_library(imgui SHARED ${IMGUI_SOURCES} ${BACKENDS})
 
 # Add include directories
-target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${glfw_SOURCE_DIR})
+target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${glfw_SOURCE_DIR}/include)
