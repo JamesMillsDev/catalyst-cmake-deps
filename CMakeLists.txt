@@ -51,5 +51,9 @@ endforeach()
 # Create a shared library for ImGui
 add_library(imgui SHARED ${IMGUI_SOURCES} ${BACKENDS})
 
+target_link_libraries(catalyst.input imgui
+        glfw
+)
+
 # Add include directories
 target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${glfw_SOURCE_DIR}/include)
