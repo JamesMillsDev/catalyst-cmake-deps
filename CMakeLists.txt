@@ -3,12 +3,21 @@
 # Set minimum CMake version
 cmake_minimum_required(VERSION 3.10)
 
+include(FetchContent)
+
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+)
+
 execute_process(
     COMMAND git submodule update --init --recursive
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     RESULT_VARIABLE GIT_SUBMODULE_RESULT
     ERROR_VARIABLE GIT_SUBMODULE_ERROR
 )
+
+FetchContent_MakeAvailable(glfw)
 
 # Project name (Optional)
 project(ImGui)
