@@ -17,6 +17,19 @@ execute_process(
     ERROR_VARIABLE GIT_SUBMODULE_ERROR
 )
 
+# Ensure the correct branch is checked out for ImGui submodule
+execute_process(
+    COMMAND git -C ${CMAKE_SOURCE_DIR}/imgui fetch origin docking
+    COMMAND git -C ${CMAKE_SOURCE_DIR}/imgui checkout docking
+    COMMAND git -C ${CMAKE_SOURCE_DIR}/imgui pull origin docking
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    RESULT_VARIABLE GIT_RESULT
+)
+
+if (NOT GIT_RESULT EQUAL "0")
+    message(FATAL_ERROR "Failed to fetch and checkout ImGui docking branch")
+endif()
+
 FetchContent_MakeAvailable(glfw)
 
 # Project name (Optional)
