@@ -1,28 +1,29 @@
 # external/imgui/CMakeLists.txt
 
-# Set minimum CMake version
 cmake_minimum_required(VERSION 3.10)
 
 include(FetchContent)
 
+# Fetch GLFW (this part is fine)
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
 )
-
-execute_process(
-    COMMAND git clone --branch docking --single-branch https://github.com/ocornut/imgui.git
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    RESULT_VARIABLE GIT_SUBMODULE_RESULT
-    ERROR_VARIABLE GIT_SUBMODULE_ERROR
-)
-
 FetchContent_MakeAvailable(glfw)
 
-# Project name (Optional)
+# Fetch ImGui manually (since it has no CMakeLists.txt)
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG docking  # Use the docking branch
+    GIT_SHALLOW TRUE
+)
+FetchContent_Populate(imgui) # Clones the repo into imgui_SOURCE_DIR
+
+# Project name (optional)
 project(ImGui)
 
-set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
+set(IMGUI_DIR "${imgui_SOURCE_DIR}")
 
 # List of all possible backend files (both .cpp and .h)
 set(ALL_BACKENDS 
@@ -30,8 +31,11 @@ set(ALL_BACKENDS
 	"opengl3"
 )
 
-# Specify source files
-file(GLOB IMGUI_SOURCES "${IMGUI_DIR}/*.cpp" "${IMGUI_DIR}/*.h")
+# Collect ImGui source files manually
+file(GLOB IMGUI_SOURCES 
+    "${IMGUI_DIR}/*.cpp"
+    "${IMGUI_DIR}/*.h"
+)
 
 list(GET ALL_BACKENDS 0 FIRST_BACKEND)
 
@@ -48,12 +52,13 @@ foreach(backend ${ALL_BACKENDS})
 	endif()
 endforeach()
 
-# Create a shared library for ImGui
-add_library(imgui SHARED ${IMGUI_SOURCES} ${BACKENDS})
+# Create an ImGui static library
+add_library(imgui STATIC ${IMGUI_SOURCES} ${BACKENDS})
 
-target_link_libraries(imgui PRIVATE
-        glfw
+target_link_libraries(imgui PRIVATE glfw)
+
+# Include directories
+target_include_directories(imgui PUBLIC 
+    ${IMGUI_DIR} 
+    ${glfw_SOURCE_DIR}/include
 )
-
-# Add include directories
-target_include_directories(imgui PUBLIC ${IMGUI_DIR} ${glfw_SOURCE_DIR}/include)
